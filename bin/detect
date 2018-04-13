@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+# bin/detect <BUILD_DIR>
+
+set -eu -o pipefail
+
+echo 'ActiveStorage Preview'
