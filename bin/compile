@@ -28,15 +28,16 @@ APT_OPTIONS="$APT_OPTIONS -o dir::cache=$APT_CACHE_DIR"
 APT_OPTIONS="$APT_OPTIONS -o dir::state=$APT_STATE_DIR"
 APT_OPTIONS="$APT_OPTIONS -o dir::etc::sourcelist=/etc/apt/sources.list"
 
-echo 'Updating package list' | indent
-apt-get $APT_OPTIONS update >/dev/null
-
 echo -n 'Downloading packages' | indent
-packages=('ffmpeg' 'libpulse0' 'libxdamage1' 'libxfixes3' 'poppler-utils')
-for package in "${packages[@]}"; do
-  apt-get $APT_OPTIONS -y -d install --reinstall $package >/dev/null
-  echo -n '.'
-done
+apt-get $APT_OPTIONS update >/dev/null
+apt-get $APT_OPTIONS -y -d install --reinstall poppler-utils >/dev/null
+echo -n '.'
+
+SFFMPEG_VERSION="4.0.0-1"
+SFFMPEG_FILENAME="sffmpeg_${SFFMPEG_VERSION}_amd64.deb"
+curl -sL -o "$APT_CACHE_DIR/archives/$SFFMPEG_FILENAME" "https://heroku-activestorage-default.s3.amazonaws.com/sffmpeg/$SFFMPEG_FILENAME"
+echo -n '.'
+
 echo ''
 
 mkdir -p $BUILD_DIR/.heroku/activestorage-preview
