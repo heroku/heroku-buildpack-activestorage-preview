@@ -52,7 +52,6 @@ apt-get $APT_OPTIONS update >/dev/null
 apt-get $APT_OPTIONS -y -d install --reinstall poppler-utils >/dev/null
 echo -n '.'
 
-SFFMPEG_VERSION="4.2.1-2"
 SFFMPEG_FILENAME="sffmpeg_${SFFMPEG_VERSION}_amd64.deb"
 curl -sL -o "$APT_CACHE_DIR/archives/$SFFMPEG_FILENAME" "https://heroku-activestorage-default.s3.amazonaws.com/sffmpeg/$SFFMPEG_FILENAME"
 echo -n '.'
