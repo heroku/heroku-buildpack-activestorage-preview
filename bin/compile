@@ -17,7 +17,7 @@ function indent() {
 
 echo '-----> Installing binary dependencies for ActiveStorage Preview'
 
-SFFMPEG_VERSION="4.2.1-2"
+SFFMPEG_VERSION="4.2.3"
 
 # Store which ffmpeg version was installed in the cache to bust the cache if it changes
 if [ -f $CACHE_DIR/.apt/SFFMPEG ]; then
