@@ -15,6 +15,9 @@ RSpec.describe "This buildpack" do
       app.deploy do
         # Assert the behavior you desire here
         expect(app.output).to match("deployed to Heroku")
+
+        expect(app.run("which ffmpeg")).to match("/app/.heroku/activestorage-preview/usr/bin/ffmpeg")
+        expect(app.run("which pdftoppm")).to match("/app/.heroku/activestorage-preview/usr/bin/pdftoppm")
       end
     end
   end
