@@ -1,0 +1,32 @@
+name: heroku/heroku-buildpack-activestorage-preview/build
+on:
+  push:
+env:
+  HATCHET_APP_LIMIT: xxxxxxx
+  HATCHET_EXPENSIVE_MODE: xxxxxxx
+  HATCHET_RETRIES: xxxxxxx
+  HEROKU_API_KEY: xxxxxxx
+  HEROKU_API_USER: xxxxxxx
+  IS_RUNNING_ON_CI: xxxxxxx
+jobs:
+  ruby-2.7:
+    runs-on: sfdc-hk-ubuntu-latest
+    container:
+      image: ruby:2.7
+    steps:
+    - uses: actions/checkout@v2
+    - name: restore_cache
+      uses: actions/cache@v2
+      with:
+        key: v1_bundler_deps-{{ .Environment.${{ github.job }} }}
+        restore-keys: v1_bundler_deps-{{ .Environment.${{ github.job }} }}
+        path: "./vendor/bundle"
+    - name: install dependencies
+      run: |-
+        bundle install --jobs=4 --retry=3 --path vendor/bundle
+        bundle update
+        bundle clean
+    - name: Hatchet setup
+      run: bundle exec hatchet ci:setup
+    - name: Run test suite
+      run: PARALLEL_SPLIT_TEST_PROCESSES=25 IS_RUNNING_ON_CI=1 bundle exec parallel_split_test spec/
