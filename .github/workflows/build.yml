@@ -1,16 +1,17 @@
 name: heroku/heroku-buildpack-activestorage-preview/build
 on:
   push:
-env:
-  HATCHET_APP_LIMIT: xxxxxxx
-  HATCHET_EXPENSIVE_MODE: xxxxxxx
-  HATCHET_RETRIES: xxxxxxx
-  HEROKU_API_KEY: xxxxxxx
-  HEROKU_API_USER: xxxxxxx
-  IS_RUNNING_ON_CI: xxxxxxx
+
 jobs:
-  ruby-2.7:
-    runs-on: sfdc-hk-ubuntu-latest
+  ruby-2-7:
+    runs-on: ubuntu-22.04
+    env:
+      HATCHET_APP_LIMIT: 100
+      HATCHET_RETRIES: 3
+      HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
+      HEROKU_API_USER: ${{ secrets.HEROKU_API_USER }}
+      IS_RUNNING_ON_CI: 1
+      HATCHET_EXPENSIVE_MODE: 1
     container:
       image: ruby:2.7
     steps:
@@ -24,7 +25,6 @@ jobs:
     - name: install dependencies
       run: |-
         bundle install --jobs=4 --retry=3 --path vendor/bundle
-        bundle update
         bundle clean
     - name: Hatchet setup
       run: bundle exec hatchet ci:setup
