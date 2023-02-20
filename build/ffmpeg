@@ -193,6 +193,11 @@ if [[ " ${needed[*]} " =~ " libsvtav1enc-dev " ]]; then
 else
 	echo "       building without libsvtav1enc"
 fi
+# the following are for better parity with SFFMPEG
+configureopts+=(
+	--enable-pic \
+	--enable-runtime-cpudetect \
+)
 PATH="${OUT_PREFIX}/bin:$PATH" PKG_CONFIG_PATH="${OUT_PREFIX}/lib/pkgconfig" ./configure "${configureopts[@]}"
 
 echo "-----> Building FFMPEG..."
