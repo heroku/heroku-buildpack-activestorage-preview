@@ -1,0 +1,205 @@
+#!/usr/bin/env bash
+
+# fail hard
+set -o pipefail
+# fail harder
+set -eu
+
+OUT_PREFIX=$1
+
+dep_formula=${0#$WORKSPACE_DIR/}
+dep_name=$(basename $BASH_SOURCE)
+dep_version=${dep_formula#"${dep_name}-"}
+dep_package=${dep_name}-${dep_version}
+dep_dirname=${dep_package}
+dep_archive_name=${dep_dirname}.tar.bz2
+dep_url=https://ffmpeg.org/releases/${dep_archive_name}
+
+echo "-----> Building ${dep_package}..."
+
+# we mostly follow https://trac.ffmpeg.org/wiki/CompilationGuide/Ubuntu
+
+# check for the hard dependencies that must be on the stack image
+# first, the main dependencies from the compilation guide
+# we do not need anything for "displaying"; see the note in the compilation guide:
+# "Note: Server users can omit the ffplay and x11grab dependencies: libsdl2-dev libva-dev libvdpau-dev libxcb1-dev libxcb-shm0-dev libxcb-xfixes0-dev."
+needed=(
+	gir1.2-harfbuzz-0.0 \
+	libass9 \
+	libfreetype6 \
+	libfribidi0 \
+	libgraphite2-3 \
+	libgnutls30 \
+	libharfbuzz-gobject0 \
+	libharfbuzz-icu0 \
+	libharfbuzz0b \
+	libmp3lame0 \
+	libogg0 \
+	libunistring2 \
+	libvorbis0a \
+	libvorbisenc2 \
+	libvorbisfile3 \
+	zlib1g \
+)
+# we also apt-get install almost everything else from the compilation guide; in order of appearance
+needed+=(
+	libnuma1 \
+	libopus0 \
+)
+# some version-specific installs
+if [[ "$STACK" == "heroku-18" ]]; then
+	needed+=(
+		libx264-152
+		libx265-146
+		libvpx5
+	)
+else
+	if [[ "$STACK" == "heroku-20" ]]; then
+		needed+=(
+			libaom0
+			libx264-155
+			libx265-179
+			libvpx6
+		)
+	else
+		needed+=(
+			libaom3
+			libsvtav1enc0 # we can take this one from apt for 22.04+
+			libdav1d5 # we can take this one from apt for 22.04+
+			libx264-163
+			libx265-199
+			libvpx7
+		)
+	fi
+fi
+# 
+
+echo "-----> Checking for required run-time libraries..."
+missing=$(comm -1 -3 <(dpkg-query -W -f '${package}\n' | sort) <(IFS=$'\n'; echo "${needed[*]}" | sort))
+if [[ "$missing" ]]; then
+	echo "Error! Missing libraries: $missing"
+	exit 1
+fi
+
+# next, tooling and headers we need for building this now
+# first, the main dependencies from the compilation guide
+# we do not need anything for "displaying"; see the note in the compilation guide:
+# "Note: Server users can omit the ffplay and x11grab dependencies: libsdl2-dev libva-dev libvdpau-dev libxcb1-dev libxcb-shm0-dev libxcb-xfixes0-dev."
+needed=(
+  autoconf \
+  automake \
+  build-essential \
+  cmake \
+  git-core \
+  libass-dev \
+  libfreetype6-dev \
+  libgnutls28-dev \
+  libmp3lame-dev \
+  libtool \
+  libunistring-dev \
+  libvorbis-dev \
+  # meson \ # installed via pip
+  ninja-build \
+  pkg-config \
+  texinfo \
+  wget \
+  yasm \
+  zlib1g-dev
+)
+if [[ "$STACK" == "heroku-18" ]]; then
+	needed+=(
+		# python3-pip # to install an up-to-date meson
+	)
+else
+	needed+=(
+		libaom-dev
+	)
+	if [[ "$STACK" == "heroku-20" ]]; then
+		:
+	else
+		needed+=(
+			libdav1d-dev
+			libsvtav1enc-dev
+		)
+	fi
+fi
+# we also apt-get install almost everything else from the compilation guide; in order of appearance
+needed+=(
+	nasm
+	libx264-dev
+	libx265-dev
+	libnuma-dev
+	libvpx-dev
+	# libfdk-aac-dev # not for now, as it's multiverse, and requires --enable-nonfree
+	libopus-dev
+)
+
+echo "-----> Installing additional build-time packages..."
+missing=$(comm -1 -3 <(dpkg-query -W -f '${package}\n' | sort) <(IFS=$'\n'; echo "${needed[*]}" | sort))
+if [[ "$missing" ]]; then
+	apt-get update -qq || { echo "Failed to 'apt-get update'. You must build this formula using Docker."; exit 1; }
+	apt-get install --no-install-recommends -q -y $missing
+fi
+
+# ffmpeg time!
+echo "-----> Downloading ${dep_archive_name}..."
+curl -L "${dep_url}" | tar xj
+pushd "${dep_dirname}"
+
+echo "-----> Configuring FFMPEG..."
+configureopts=(
+	--prefix="${OUT_PREFIX}" \
+	--pkg-config-flags="--static" \
+	--extra-cflags="-I${OUT_PREFIX}/include" \
+	--extra-ldflags="-L${OUT_PREFIX}/lib" \
+	--extra-libs="-lpthread -lm" \
+	--ld="g++" \
+	--bindir="${OUT_PREFIX}/bin" \
+	--enable-gpl \
+	--enable-gnutls \
+	--enable-libass \
+	# --enable-libfdk-aac \ # not for now, as it's multiverse, and requires --enable-nonfree
+	--enable-libfreetype \
+	--enable-libmp3lame \
+	--enable-libopus \
+	--enable-libvorbis \
+	--enable-libvpx \
+	--enable-libx264 \
+	--enable-libx265 \
+	# --enable-nonfree \
+	--extra-libs="-lpthread" \
+)
+if [[ " ${needed[*]} " =~ " libaom-dev " ]]; then
+	echo "       libaom found, using --enable-libaom"
+	configureopts+=(
+		--enable-libaom \
+	)
+else
+	echo "       building without libaom"
+fi
+if [[ " ${needed[*]} " =~ " libdav1d-dev " ]]; then
+	echo "       libdav1d found, using --enable-libdav1d"
+	configureopts+=(
+		--enable-libdav1d \
+	)
+else
+	echo "       building without libdav1d"
+fi
+if [[ " ${needed[*]} " =~ " libsvtav1enc-dev " ]]; then
+	echo "       libsvtav1enc found, using --enable-libsvtav1"
+	configureopts+=(
+		--enable-libsvtav1 \
+	)
+else
+	echo "       building without libsvtav1enc"
+fi
+PATH="${OUT_PREFIX}/bin:$PATH" PKG_CONFIG_PATH="${OUT_PREFIX}/lib/pkgconfig" ./configure "${configureopts[@]}"
+
+echo "-----> Building FFMPEG..."
+PATH="${OUT_PREFIX}/bin:$PATH" make -s -j9
+echo "-----> Installing FFMPEG..."
+make install -s
+echo "-----> Stripping..."
+find "${OUT_PREFIX}" -type f \( -executable -o -name '*.a' \) -exec sh -c "file -i '{}' | grep -Eq 'application/x-(archive|(pie-)?executable|sharedlib); charset=binary'" \; -print | xargs strip --strip-unneeded
+popd
+
