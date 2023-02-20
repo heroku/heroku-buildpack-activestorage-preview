@@ -50,6 +50,7 @@ needed+=(
 needed+=(
 	libopencore-amrnb0 \
 	libopencore-amrwb0 \
+	libspeex1 \
 )
 # some version-specific installs
 if [[ "$STACK" == "heroku-18" ]]; then
@@ -142,6 +143,7 @@ needed+=(
 needed+=(
 	libopencore-amrnb-dev \
 	libopencore-amrwb-dev \
+	libspeex-dev \
 )
 
 echo "-----> Installing additional build-time packages..."
@@ -210,6 +212,7 @@ configureopts+=(
 	--enable-version3 # change GPLv2 to GPLv3, for libopencore-amrwb
 	--enable-libopencore-amrnb \
 	--enable-libopencore-amrwb \
+	--enable-libspeex \
 )
 PATH="${OUT_PREFIX}/bin:$PATH" PKG_CONFIG_PATH="${OUT_PREFIX}/lib/pkgconfig" ./configure "${configureopts[@]}"
 
