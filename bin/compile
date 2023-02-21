@@ -48,45 +48,46 @@ else
 fi
 
 echo -n 'Downloading packages' | indent
-apt-get $APT_OPTIONS update >/dev/null
-apt-get $APT_OPTIONS -y -d install --reinstall poppler-utils "$LIBPOPPLER" libnss3 libnspr4 >/dev/null
+apt-get "$APT_OPTIONS" update >/dev/null
+apt-get "$APT_OPTIONS" -y -d install --reinstall poppler-utils "$LIBPOPPLER" libnss3 libnspr4 >/dev/null
 echo -n '.'
 
 dir="$BUILD_DIR/.heroku/activestorage-preview"
-mkdir -p $dir
-url = "https://heroku-activestorage-default.s3.amazonaws.com/dist_${STACK}_amd64/ffmpeg-${SFFMPEG_VERSION}.tar.gz"
-curl_retry_on_18 -s --fail --retry 3 --retry-connrefused --connect-timeout ${CURL_CONNECT_TIMEOUT:-3} "$url" | tar xvz -C "$dir" >/dev/null 2>&1
+mkdir -p "$dir"
+
+url="https://heroku-activestorage-default.s3.amazonaws.com/dist_${STACK}_amd64/ffmpeg-${SFFMPEG_VERSION}.tar.gz"
+curl_retry_on_18 -s --fail --retry 3 --retry-connrefused --connect-timeout "${CURL_CONNECT_TIMEOUT:-3}" "$url" | tar xvz -C "$dir" >/dev/null 2>&1
 echo -n '.'
 
 echo ''
 
-mkdir -p $BUILD_DIR/.heroku/activestorage-preview
+mkdir -p "$BUILD_DIR/.heroku/activestorage-preview"
 
 echo -n 'Installing packages' | indent
-for deb in $(ls -1 $APT_CACHE_DIR/archives/*.deb); do
-  dpkg -x $deb $BUILD_DIR/.heroku/activestorage-preview
+for deb in "$APT_CACHE_DIR"/archives/*.deb; do
+  dpkg -x "$deb" "$BUILD_DIR/.heroku/activestorage-preview"
   echo -n '.'
 done
 echo ''
 
-paths=$(cd $BUILD_DIR && find ./.heroku/activestorage-preview -iregex '.*/bin' -type d)
-library_paths=$(cd $BUILD_DIR && find ./.heroku/activestorage-preview -iregex '.*\.so\(\.[0-9]+\)*' | xargs -r -n 1 dirname | sort | uniq)
+paths=$(cd "$BUILD_DIR" && find ./.heroku/activestorage-preview -iregex '.*/bin' -type d)
+library_paths=$(cd "$BUILD_DIR" && find ./.heroku/activestorage-preview -iregex '.*\.so\(\.[0-9]+\)*' | xargs -r -n 1 dirname | sort | uniq)
 
 # write profile script
-mkdir -p $BUILD_DIR/.profile.d
-cat <<EOF >$BUILD_DIR/.profile.d/000_activestorage_preview.sh
-export PATH="$(echo $paths | xargs -n 1 | sed 's/^./$HOME/' | paste -s -d ':' -):\$PATH"
+mkdir -p "$BUILD_DIR/.profile.d"
+cat <<EOF >"$BUILD_DIR/.profile.d/000_activestorage_preview.sh"
+export PATH="$(echo "$paths" | xargs -n 1 | sed 's/^./$HOME/' | paste -s -d ':' -):\$PATH"
 EOF
 if [[ -n "$library_paths" ]]; then
-cat <<EOF >>$BUILD_DIR/.profile.d/000_activestorage_preview.sh
-  export LD_LIBRARY_PATH="$(echo $library_paths | xargs -n 1 | sed 's/^./$HOME/' | paste -s -d ':' -):\$LD_LIBRARY_PATH"
+cat <<EOF >>"$BUILD_DIR/.profile.d/000_activestorage_preview.sh"
+  export LD_LIBRARY_PATH="$(echo "$library_paths" | xargs -n 1 | sed 's/^./$HOME/' | paste -s -d ':' -):\$LD_LIBRARY_PATH"
 EOF
 fi
 
 # export to other buildpacks
-export PATH="$(echo $paths | xargs -n 1 | sed "s/^./${BUILD_DIR//\//\\/}/" | paste -s -d ':' -)${PATH:+:}${PATH:-}"
+export PATH="$(echo "$paths" | xargs -n 1 | sed "s/^./${BUILD_DIR//\//\\/}/" | paste -s -d ':' -)${PATH:+:}${PATH:-}"
 if [[ -n "$library_paths" ]]; then
-  export LD_LIBRARY_PATH="$(echo $library_paths | xargs -n 1 | sed "s/^./${BUILD_DIR//\//\\/}/" | paste -s -d ':' -)${LD_LIBRARY_PATH:+:}${LD_LIBRARY_PATH:-}"
-  export LIBRARY_PATH="$(echo $library_paths | xargs -n 1 | sed "s/^./${BUILD_DIR//\//\\/}/" | paste -s -d ':' -)${LIBRARY_PATH:+:}${LIBRARY_PATH:-}"
+  export LD_LIBRARY_PATH="$(echo "$library_paths" | xargs -n 1 | sed "s/^./${BUILD_DIR//\//\\/}/" | paste -s -d ':' -)${LD_LIBRARY_PATH:+:}${LD_LIBRARY_PATH:-}"
+  export LIBRARY_PATH="$(echo "$library_paths" | xargs -n 1 | sed "s/^./${BUILD_DIR//\//\\/}/" | paste -s -d ':' -)${LIBRARY_PATH:+:}${LIBRARY_PATH:-}"
 fi
 export | grep -E -e ' (PATH|LD_LIBRARY_PATH|LIBRARY_PATH)=' >"$BUILDPACK_DIR/export"
