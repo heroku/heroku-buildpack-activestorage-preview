@@ -1,9 +1,17 @@
-name: heroku/heroku-buildpack-activestorage-preview/build
+name: CI
 on:
   push:
+    # Avoid duplicate builds on PRs.
+    branches:
+      - main
+  pull_request:
 
 jobs:
-  ruby-2-7:
+  test:
+    strategy:
+      fail-fast: false
+      matrix:
+        ruby-version: ["3.1"]
     runs-on: ubuntu-22.04
     env:
       HATCHET_APP_LIMIT: 100
@@ -12,21 +20,16 @@ jobs:
       HEROKU_API_USER: ${{ secrets.HEROKU_API_USER }}
       IS_RUNNING_ON_CI: 1
       HATCHET_EXPENSIVE_MODE: 1
-    container:
-      image: ruby:2.7
+      PARALLEL_SPLIT_TEST_PROCESSES: 25
     steps:
-    - uses: actions/checkout@v2
-    - name: restore_cache
-      uses: actions/cache@v2
-      with:
-        key: v1_bundler_deps-{{ .Environment.${{ github.job }} }}
-        restore-keys: v1_bundler_deps-{{ .Environment.${{ github.job }} }}
-        path: "./vendor/bundle"
-    - name: install dependencies
-      run: |-
-        bundle install --jobs=4 --retry=3 --path vendor/bundle
-        bundle clean
-    - name: Hatchet setup
-      run: bundle exec hatchet ci:setup
-    - name: Run test suite
-      run: PARALLEL_SPLIT_TEST_PROCESSES=25 IS_RUNNING_ON_CI=1 bundle exec parallel_split_test spec/
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Set up Ruby ${{ matrix.ruby-version }} and dependencies
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: ${{ matrix.ruby-version }}
+          bundler-cache: true
+      - name: Hatchet setup
+        run: bundle exec hatchet ci:setup
+      - name: Run test suite
+        run: bundle exec parallel_split_test spec/
