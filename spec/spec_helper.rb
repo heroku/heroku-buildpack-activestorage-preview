@@ -1,6 +1,7 @@
 require "bundler/setup"
 
 require 'rspec/retry'
+require 'fileutils'
 
 ENV["HATCHET_BUILDPACK_BASE"] = "https://github.com/heroku/heroku-buildpack-activestorage-preview.git"
 
@@ -26,5 +27,9 @@ end
 
 def spec_dir
   Pathname.new(__dir__)
+end
+
+def fixtures
+  spec_dir.join('fixtures')
 end
 
