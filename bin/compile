@@ -7,6 +7,16 @@ BUILDPACK_DIR="$(dirname "$(dirname "$0")")"
 BUILD_DIR="$1"
 CACHE_DIR="$2"
 
+curl_retry_on_18() {
+  local ec=18;
+  local attempts=0;
+  while (( ec == 18 && attempts++ < 3 )); do
+    curl "$@" # -C - would return code 33 if unsupported by server
+    ec=$?
+  done
+  return $ec
+}
+
 function indent() {
   c='s/^/       /'
   case $(uname) in
@@ -17,30 +27,12 @@ function indent() {
 
 echo '-----> Installing binary dependencies for ActiveStorage Preview'
 
-SFFMPEG_VERSION="4.2.3"
-
-# Store which ffmpeg version was installed in the cache to bust the cache if it changes
-if [ -f $CACHE_DIR/.apt/SFFMPEG ]; then
-	CACHED_SFFMPEG=$(cat "$CACHE_DIR/.apt/SFFMPEG")
-else
-	CACHED_SFFMPEG=$SFFMPEG_VERSION
-fi
+SFFMPEG_VERSION="5.1.2"
 
 APT_CACHE_DIR="$CACHE_DIR/.heroku/activestorage-preview/$STACK/cache"
 APT_STATE_DIR="$CACHE_DIR/.heroku/activestorage-preview/$STACK/state"
-
-if [ -f $CACHE_DIR/.apt/SFFMPEG ] && [[ $CACHED_SFFMPEG == $SFFMPEG_VERSION ]] ; then
-	echo 'Reusing cache' | indent
-else
-	echo 'Detected ffmpeg version change, flushing cache' | indent
-	rm -rf $APT_CACHE_DIR
-fi
 mkdir -p "$APT_CACHE_DIR/archives/partial"
 mkdir -p "$APT_STATE_DIR/lists/partial"
-
-# Ensure we store the ffmpeg version in the cache for next time.
-mkdir -p "$CACHE_DIR/.apt"
-echo "$SFFMPEG_VERSION" > "$CACHE_DIR/.apt/SFFMPEG"
 
 APT_OPTIONS="-o debug::nolocking=true"
 APT_OPTIONS="$APT_OPTIONS -o dir::cache=$APT_CACHE_DIR"
@@ -60,8 +52,10 @@ apt-get $APT_OPTIONS update >/dev/null
 apt-get $APT_OPTIONS -y -d install --reinstall poppler-utils "$LIBPOPPLER" libnss3 libnspr4 >/dev/null
 echo -n '.'
 
-SFFMPEG_FILENAME="sffmpeg_${SFFMPEG_VERSION}_amd64.deb"
-curl -sL -o "$APT_CACHE_DIR/archives/$SFFMPEG_FILENAME" "https://heroku-activestorage-default.s3.amazonaws.com/sffmpeg/$SFFMPEG_FILENAME"
+dir="$BUILD_DIR/.heroku/activestorage-preview"
+mkdir -p $dir
+url = "https://heroku-activestorage-default.s3.amazonaws.com/dist_${STACK}_amd64/ffmpeg-${SFFMPEG_VERSION}.tar.gz"
+curl_retry_on_18 -s --fail --retry 3 --retry-connrefused --connect-timeout ${CURL_CONNECT_TIMEOUT:-3} "$url" | tar xvz -C "$dir" >/dev/null 2>&1
 echo -n '.'
 
 echo ''
