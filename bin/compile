@@ -40,8 +40,8 @@ APT_OPTIONS="$APT_OPTIONS -o dir::state=$APT_STATE_DIR"
 APT_OPTIONS="$APT_OPTIONS -o dir::etc::sourcelist=/etc/apt/sources.list"
 
 echo -n 'Downloading packages' | indent
-apt-get "$APT_OPTIONS" update >/dev/null
-apt-get "$APT_OPTIONS" -y -d install --reinstall poppler-utils >/dev/null
+apt-get $APT_OPTIONS update >/dev/null
+apt-get $APT_OPTIONS -y -d install --reinstall poppler-utils >/dev/null
 echo -n '.'
 
 dir="$BUILD_DIR/.heroku/activestorage-preview"
