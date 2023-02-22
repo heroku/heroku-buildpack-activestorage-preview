@@ -1,1 +1,2 @@
-## Unreleased
+- Upgrade FFMPEG to version 5.1.2 (https://github.com/heroku/heroku-buildpack-activestorage-preview/pull/30)
+- FFMPEG is no longer statically compiled, depends on [stack image packages](https://devcenter.heroku.com/changelog-items/2547) (https://github.com/heroku/heroku-buildpack-activestorage-preview/pull/30)

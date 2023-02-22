@@ -1,6 +1,6 @@
 # Official Rails 5.2 Active Storage Previews Buildpack
 
-This is an [official Heroku buildpack](https://devcenter.heroku.com/articles/language-support-policy#supported-buildpacks) to support Rails 5.2 users of [Active Storage previews](https://devcenter.heroku.com/articles/active-storage-on-heroku).  
+This is an [official Heroku buildpack](https://devcenter.heroku.com/articles/language-support-policy#supported-buildpacks) to support Rails 5.2 users of [Active Storage previews](https://devcenter.heroku.com/articles/active-storage-on-heroku).
 
 One of the marquee features of Active Storage is the ability to use “previews” of non-image attachments. Specifically you can preview PDFs and Videos. To use this feature your application needs access to system resources that know how to work with these files. By default Rails ships with support with poppler for PDF previews, and ffmpeg for Video previews. These system dependencies are not available by default on Heroku.
 
@@ -18,3 +18,6 @@ heroku run bash
 /usr/local/bin/ffmpeg
 ```
 
+## Versioning
+
+The main branch is stable. Each commit is a stand alone version.
