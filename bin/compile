@@ -27,7 +27,7 @@ function indent() {
 
 echo '-----> Installing binary dependencies for ActiveStorage Preview'
 
-SFFMPEG_VERSION="5.1.2"
+FFMPEG_VERSION="5.1.2"
 
 APT_CACHE_DIR="$CACHE_DIR/.heroku/activestorage-preview/cache"
 APT_STATE_DIR="$CACHE_DIR/.heroku/activestorage-preview/state"
@@ -47,7 +47,7 @@ echo -n '.'
 dir="$BUILD_DIR/.heroku/activestorage-preview"
 mkdir -p "$dir"
 
-url="https://heroku-activestorage-default.s3.amazonaws.com/dist_${STACK}_amd64/ffmpeg-${SFFMPEG_VERSION}.tar.gz"
+url="https://heroku-activestorage-default.s3.amazonaws.com/dist_${STACK}_amd64/ffmpeg-${FFMPEG_VERSION}.tar.gz"
 curl_retry_on_18 -s --fail --retry 3 --retry-connrefused --connect-timeout "${CURL_CONNECT_TIMEOUT:-3}" "$url" | tar xvz -C "$dir" >/dev/null 2>&1
 echo -n '.'
 
