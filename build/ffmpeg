@@ -217,13 +217,17 @@ configureopts+=(
 	--enable-libspeex \
 	--enable-libtheora \
 )
+# these make for a smaller final archive
+configureopts+=(
+	--disable-doc # do not generate docs/manpages
+)
 PATH="${OUT_PREFIX}/bin:$PATH" PKG_CONFIG_PATH="${OUT_PREFIX}/lib/pkgconfig" ./configure "${configureopts[@]}"
 
 echo "-----> Building FFMPEG..."
 PATH="${OUT_PREFIX}/bin:$PATH" make -s -j9
 echo "-----> Installing FFMPEG..."
 make install -s
-echo "-----> Stripping..."
-find "${OUT_PREFIX}" -type f \( -executable -o -name '*.a' \) -exec sh -c "file -i '{}' | grep -Eq 'application/x-(archive|(pie-)?executable|sharedlib); charset=binary'" \; -print | xargs strip --strip-unneeded
+echo "-----> Removing include/, lib/, and share/ffmpeg/examples/..."
+rm -rf "${OUT_PREFIX}"/{include,lib,share/ffmpeg/examples}
+# no stripping needed, FFMPEG does that already during build
 popd
-
