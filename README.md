@@ -18,3 +18,8 @@ heroku run bash
 /usr/local/bin/ffmpeg
 ```
 
+## Development
+
+### Binaries
+
+Instructions for building binaries (currently only FFMPEG) can be found in [build/README.md](build/README.md).
