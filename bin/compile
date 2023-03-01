@@ -68,17 +68,23 @@ done
 echo ''
 
 paths=$(cd $BUILD_DIR && find ./.heroku/activestorage-preview -iregex '.*/bin' -type d)
-library_paths=$(cd $BUILD_DIR && find ./.heroku/activestorage-preview -iregex '.*\.so\(\.[0-9]+\)*' | xargs -n 1 dirname | sort | uniq)
+library_paths=$(cd $BUILD_DIR && find ./.heroku/activestorage-preview -iregex '.*\.so\(\.[0-9]+\)*' | xargs -r -n 1 dirname | sort | uniq)
 
 # write profile script
 mkdir -p $BUILD_DIR/.profile.d
 cat <<EOF >$BUILD_DIR/.profile.d/000_activestorage_preview.sh
 export PATH="$(echo $paths | xargs -n 1 | sed 's/^./$HOME/' | paste -s -d ':' -):\$PATH"
-export LD_LIBRARY_PATH="$(echo $library_paths | xargs -n 1 | sed 's/^./$HOME/' | paste -s -d ':' -):\$LD_LIBRARY_PATH"
 EOF
+if [[ -n "$library_paths" ]]; then
+cat <<EOF >>$BUILD_DIR/.profile.d/000_activestorage_preview.sh
+  export LD_LIBRARY_PATH="$(echo $library_paths | xargs -n 1 | sed 's/^./$HOME/' | paste -s -d ':' -):\$LD_LIBRARY_PATH"
+EOF
+fi
 
 # export to other buildpacks
 export PATH="$(echo $paths | xargs -n 1 | sed "s/^./${BUILD_DIR//\//\\/}/" | paste -s -d ':' -)${PATH:+:}${PATH:-}"
-export LD_LIBRARY_PATH="$(echo $library_paths | xargs -n 1 | sed "s/^./${BUILD_DIR//\//\\/}/" | paste -s -d ':' -)${LD_LIBRARY_PATH:+:}${LD_LIBRARY_PATH:-}"
-export LIBRARY_PATH="$(echo $library_paths | xargs -n 1 | sed "s/^./${BUILD_DIR//\//\\/}/" | paste -s -d ':' -)${LIBRARY_PATH:+:}${LIBRARY_PATH:-}"
+if [[ -n "$library_paths" ]]; then
+  export LD_LIBRARY_PATH="$(echo $library_paths | xargs -n 1 | sed "s/^./${BUILD_DIR//\//\\/}/" | paste -s -d ':' -)${LD_LIBRARY_PATH:+:}${LD_LIBRARY_PATH:-}"
+  export LIBRARY_PATH="$(echo $library_paths | xargs -n 1 | sed "s/^./${BUILD_DIR//\//\\/}/" | paste -s -d ':' -)${LIBRARY_PATH:+:}${LIBRARY_PATH:-}"
+fi
 export | grep -E -e ' (PATH|LD_LIBRARY_PATH|LIBRARY_PATH)=' >"$BUILDPACK_DIR/export"
