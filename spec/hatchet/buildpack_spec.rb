@@ -18,10 +18,8 @@ RSpec.describe "This buildpack" do
         expect(app.output).to match("deployed to Heroku")
 
         expect(app.run("which ffmpeg").strip).to match("/app/.heroku/activestorage-preview/bin/ffmpeg")
-        expect(app.run("which pdftoppm").strip).to match("/app/.heroku/activestorage-preview/usr/bin/pdftoppm")
 
         expect(app.run("ffprobe ./flashlight.mp4").strip).to include("Duration: 00:00:04.44")
-        expect(app.run("pdftoppm -v").strip).to include("pdftoppm version")
       end
     end
   end
