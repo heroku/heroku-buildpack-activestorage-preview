@@ -1,8 +1,8 @@
 GIT
   remote: https://github.com/heroku/hatchet.git
-  revision: a9d3dc55e7418fcc6e0cc77cb8261597b5e50bd8
+  revision: 3f13327a11def454088ffe231bfb2a2c67696be7
   specs:
-    heroku_hatchet (7.4.0)
+    heroku_hatchet (8.0.1)
       excon (~> 0)
       platform-api (~> 3)
       rrrretry (~> 1)
