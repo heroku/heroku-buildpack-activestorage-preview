@@ -26,17 +26,17 @@ else
 	CACHED_SFFMPEG=$SFFMPEG_VERSION
 fi
 
-APT_CACHE_DIR="$CACHE_DIR/.heroku/activestorage-preview/cache"
-APT_STATE_DIR="$CACHE_DIR/.heroku/activestorage-preview/state"
+APT_CACHE_DIR="$CACHE_DIR/.heroku/activestorage-preview/$STACK/cache"
+APT_STATE_DIR="$CACHE_DIR/.heroku/activestorage-preview/$STACK/state"
 
 if [ -f $CACHE_DIR/.apt/SFFMPEG ] && [[ $CACHED_SFFMPEG == $SFFMPEG_VERSION ]] ; then
 	echo 'Reusing cache' | indent
 else
 	echo 'Detected ffmpeg version change, flushing cache' | indent
 	rm -rf $APT_CACHE_DIR
-	mkdir -p "$APT_CACHE_DIR/archives/partial"
-	mkdir -p "$APT_STATE_DIR/lists/partial"
 fi
+mkdir -p "$APT_CACHE_DIR/archives/partial"
+mkdir -p "$APT_STATE_DIR/lists/partial"
 
 # Ensure we store the ffmpeg version in the cache for next time.
 mkdir -p "$CACHE_DIR/.apt"
@@ -47,9 +47,17 @@ APT_OPTIONS="$APT_OPTIONS -o dir::cache=$APT_CACHE_DIR"
 APT_OPTIONS="$APT_OPTIONS -o dir::state=$APT_STATE_DIR"
 APT_OPTIONS="$APT_OPTIONS -o dir::etc::sourcelist=/etc/apt/sources.list"
 
+if [[ $STACK == "heroku-18" ]]; then
+  LIBPOPPLER="libpoppler73"
+elif [[ $STACK == "heroku-20" ]]; then
+  LIBPOPPLER="libpoppler97"
+else
+  LIBPOPPLER="libpoppler118"
+fi
+
 echo -n 'Downloading packages' | indent
 apt-get $APT_OPTIONS update >/dev/null
-apt-get $APT_OPTIONS -y -d install --reinstall poppler-utils >/dev/null
+apt-get $APT_OPTIONS -y -d install --reinstall poppler-utils "$LIBPOPPLER" libnss3 libnspr4 >/dev/null
 echo -n '.'
 
 SFFMPEG_FILENAME="sffmpeg_${SFFMPEG_VERSION}_amd64.deb"
