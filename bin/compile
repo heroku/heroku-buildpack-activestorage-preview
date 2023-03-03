@@ -26,17 +26,17 @@ else
 	CACHED_SFFMPEG=$SFFMPEG_VERSION
 fi
 
-APT_CACHE_DIR="$CACHE_DIR/.heroku/activestorage-preview/cache"
-APT_STATE_DIR="$CACHE_DIR/.heroku/activestorage-preview/state"
+APT_CACHE_DIR="$CACHE_DIR/.heroku/activestorage-preview/$STACK/cache"
+APT_STATE_DIR="$CACHE_DIR/.heroku/activestorage-preview/$STACK/state"
 
 if [ -f $CACHE_DIR/.apt/SFFMPEG ] && [[ $CACHED_SFFMPEG == $SFFMPEG_VERSION ]] ; then
 	echo 'Reusing cache' | indent
 else
 	echo 'Detected ffmpeg version change, flushing cache' | indent
 	rm -rf $APT_CACHE_DIR
-	mkdir -p "$APT_CACHE_DIR/archives/partial"
-	mkdir -p "$APT_STATE_DIR/lists/partial"
 fi
+mkdir -p "$APT_CACHE_DIR/archives/partial"
+mkdir -p "$APT_STATE_DIR/lists/partial"
 
 # Ensure we store the ffmpeg version in the cache for next time.
 mkdir -p "$CACHE_DIR/.apt"
