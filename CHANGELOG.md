@@ -1,2 +1,3 @@
+- Do not install Poppler utils, they are now on the stack image (https://github.com/heroku/heroku-buildpack-activestorage-preview/pull/32)
 - Upgrade FFMPEG to version 5.1.2 (https://github.com/heroku/heroku-buildpack-activestorage-preview/pull/30)
 - Include build formula for FFMPEG, now linking dynamically against newly added [stack image packages](https://devcenter.heroku.com/changelog-items/2547) (https://github.com/heroku/heroku-buildpack-activestorage-preview/pull/28)

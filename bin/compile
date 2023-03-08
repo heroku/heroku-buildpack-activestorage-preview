@@ -38,42 +38,12 @@ echo '-----> Installing binary dependencies for ActiveStorage Preview'
 INSTALL_DIR="$BUILD_DIR/.heroku/activestorage-preview"
 mkdir -p "$INSTALL_DIR"
 
-APT_CACHE_DIR="/tmp/.heroku/activestorage-preview/cache"
-mkdir -p "$APT_CACHE_DIR/archives/partial"
-
-APT_STATE_DIR="/tmp/.heroku/activestorage-preview/state"
-mkdir -p "$APT_STATE_DIR/lists/partial"
-
-APT_OPTIONS="-o debug::nolocking=true"
-APT_OPTIONS="$APT_OPTIONS -o dir::cache=$APT_CACHE_DIR"
-APT_OPTIONS="$APT_OPTIONS -o dir::state=$APT_STATE_DIR"
-APT_OPTIONS="$APT_OPTIONS -o dir::etc::sourcelist=/etc/apt/sources.list"
-
-if [[ $STACK == "heroku-18" ]]; then
-  LIBPOPPLER="libpoppler73"
-elif [[ $STACK == "heroku-20" ]]; then
-  LIBPOPPLER="libpoppler97"
-else
-  LIBPOPPLER="libpoppler118"
-fi
-
-echo 'Downloading latest poppler' | indent
-apt-get $APT_OPTIONS update >/dev/null
-apt-get $APT_OPTIONS -y -d install --reinstall poppler-utils "$LIBPOPPLER" libnss3 libnspr4 >/dev/null
-
-echo 'Installing poppler' | indent
-for deb in "$APT_CACHE_DIR"/archives/*.deb; do
-  dpkg -x "$deb" "$INSTALL_DIR"
-done
-echo 'Done' | indent
-
 echo "Downloading ffmpeg version $FFMPEG_VERSION" | indent
 curl_retry_on_18 -s --fail --retry 3 --retry-connrefused --connect-timeout "${CURL_CONNECT_TIMEOUT:-3}" "$INSTALL_URL" | tar xvz -C "$INSTALL_DIR" >/dev/null 2>&1
 echo 'Installing ffmpeg' | indent
 echo 'Done' | indent
 
 paths=$(cd "$BUILD_DIR" && find ./.heroku/activestorage-preview -iregex '.*/bin' -type d)
-library_paths=$(cd "$BUILD_DIR" && find ./.heroku/activestorage-preview -iregex '.*\.so\(\.[0-9]+\)*' | xargs -r -n 1 dirname | sort | uniq)
 
 echo 'Exporting environment variables' | indent
 # Write profile.d script for run time support
@@ -81,17 +51,8 @@ mkdir -p "$BUILD_DIR/.profile.d"
 cat <<EOF >"$BUILD_DIR/.profile.d/000_activestorage_preview.sh"
 export PATH="$(echo "$paths" | xargs -n 1 | sed 's/^./$HOME/' | paste -s -d ':' -):\$PATH"
 EOF
-if [[ -n "$library_paths" ]]; then
-cat <<EOF >>"$BUILD_DIR/.profile.d/000_activestorage_preview.sh"
-  export LD_LIBRARY_PATH="$(echo "$library_paths" | xargs -n 1 | sed 's/^./$HOME/' | paste -s -d ':' -):\$LD_LIBRARY_PATH"
-EOF
-fi
 
 # Export to other buildpacks for build time support
 export PATH="$(echo "$paths" | xargs -n 1 | sed "s/^./${BUILD_DIR//\//\\/}/" | paste -s -d ':' -)${PATH:+:}${PATH:-}"
-if [[ -n "$library_paths" ]]; then
-  export LD_LIBRARY_PATH="$(echo "$library_paths" | xargs -n 1 | sed "s/^./${BUILD_DIR//\//\\/}/" | paste -s -d ':' -)${LD_LIBRARY_PATH:+:}${LD_LIBRARY_PATH:-}"
-  export LIBRARY_PATH="$(echo "$library_paths" | xargs -n 1 | sed "s/^./${BUILD_DIR//\//\\/}/" | paste -s -d ':' -)${LIBRARY_PATH:+:}${LIBRARY_PATH:-}"
-fi
-export | grep -E -e ' (PATH|LD_LIBRARY_PATH|LIBRARY_PATH)=' >"$BUILDPACK_DIR/export"
+export | grep -E -e ' PATH=' >"$BUILDPACK_DIR/export"
 echo 'Done' | indent
