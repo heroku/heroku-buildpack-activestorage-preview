@@ -11,9 +11,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        ruby-version: ["3.1"]
+        stack: ["heroku-18", "heroku-20", "heroku-22"]
     runs-on: ubuntu-22.04
     env:
+      STACK: ${{ matrix.stack }}
       HATCHET_APP_LIMIT: 100
       HATCHET_RETRIES: 3
       HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
@@ -27,7 +28,7 @@ jobs:
       - name: Set up Ruby ${{ matrix.ruby-version }} and dependencies
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: ${{ matrix.ruby-version }}
+          ruby-version: 3.1
           bundler-cache: true
       - name: Hatchet setup
         run: bundle exec hatchet ci:setup

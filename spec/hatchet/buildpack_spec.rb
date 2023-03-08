@@ -8,7 +8,7 @@ RSpec.describe "This buildpack" do
     # To deploy a different app modify the hatchet.json or
     # commit an app to your source control and use a path
     # instead of "default_ruby" here
-    Hatchet::Runner.new("default_ruby", buildpacks: buildpacks).tap do |app|
+    new_app_with_stack("default_ruby", buildpacks: buildpacks).tap do |app|
       app.before_deploy do
         # Modfiy the app here if you need
         FileUtils.cp(fixtures.join("flashlight.mp4"), "./flashlight.mp4")

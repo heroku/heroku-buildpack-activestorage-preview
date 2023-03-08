@@ -33,3 +33,8 @@ def fixtures
   spec_dir.join('fixtures')
 end
 
+def new_app_with_stack(*args, **kwargs)
+	kwargs[:stack] ||= ENV["STACK"]
+	app = Hatchet::Runner.new(*args, **kwargs)
+	app
+end
