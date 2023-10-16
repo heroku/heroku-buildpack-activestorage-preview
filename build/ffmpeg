@@ -54,32 +54,23 @@ needed+=(
 	libtheora0 \
 )
 # some version-specific installs
-if [[ "$STACK" == "heroku-18" ]]; then
+if [[ "$STACK" == "heroku-20" ]]; then
 	needed+=(
-		libx264-152
-		libx265-146
-		libvpx5
+		libaom0
+		libx264-155
+		libx265-179
+		libvpx6
 	)
 else
-	if [[ "$STACK" == "heroku-20" ]]; then
-		needed+=(
-			libaom0
-			libx264-155
-			libx265-179
-			libvpx6
-		)
-	else
-		needed+=(
-			libaom3
-			libsvtav1enc0 # we can take this one from apt for 22.04+
-			libdav1d5 # we can take this one from apt for 22.04+
-			libx264-163
-			libx265-199
-			libvpx7
-		)
-	fi
+	needed+=(
+		libaom3
+		libsvtav1enc0 # we can take this one from apt for 22.04+
+		libdav1d5 # we can take this one from apt for 22.04+
+		libx264-163
+		libx265-199
+		libvpx7
+	)
 fi
-# 
 
 echo "-----> Checking for required run-time libraries..."
 missing=$(comm -1 -3 <(dpkg-query -W -f '${package}\n' | sort) <(IFS=$'\n'; echo "${needed[*]}" | sort))
@@ -98,6 +89,7 @@ needed=(
   build-essential \
   cmake \
   git-core \
+  libaom-dev \
   libass-dev \
   libfreetype6-dev \
   libgnutls28-dev \
@@ -113,22 +105,13 @@ needed=(
   yasm \
   zlib1g-dev
 )
-if [[ "$STACK" == "heroku-18" ]]; then
-	needed+=(
-		# python3-pip # to install an up-to-date meson
-	)
+if [[ "$STACK" == "heroku-20" ]]; then
+	:
 else
 	needed+=(
-		libaom-dev
+		libdav1d-dev
+		libsvtav1enc-dev
 	)
-	if [[ "$STACK" == "heroku-20" ]]; then
-		:
-	else
-		needed+=(
-			libdav1d-dev
-			libsvtav1enc-dev
-		)
-	fi
 fi
 # we also apt-get install almost everything else from the compilation guide; in order of appearance
 needed+=(

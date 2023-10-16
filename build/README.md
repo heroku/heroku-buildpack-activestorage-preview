@@ -8,7 +8,6 @@ This subdirectory contains `Dockerfile`s for building binaries (currently only F
 
     docker build --pull --tag heroku-activestorage-preview-build-heroku-22 --file heroku-22.Dockerfile .
     docker build --pull --tag heroku-activestorage-preview-build-heroku-20 --file heroku-20.Dockerfile .
-    docker build --pull --tag heroku-activestorage-preview-build-heroku-18 --file heroku-18.Dockerfile .
 
 ## Configuration
 
@@ -22,7 +21,6 @@ You can e.g. `bash` into each of the images you built using their tag:
 
     docker run --rm -ti heroku-activestorage-preview-build-heroku-22 bash
     docker run --rm -ti heroku-activestorage-preview-build-heroku-20 bash
-    docker run --rm -ti heroku-activestorage-preview-build-heroku-18 bash
 
 You then have a shell where you can run `bob build` and so forth. You can of course also invoke these programs directly with `docker run`.
 
@@ -69,6 +67,5 @@ To build and upload to S3, run `bob deploy`. To only build, run `bob build` (thi
 
     docker run --rm -ti heroku-activestorage-preview-build-heroku-22 bob deploy ffmpeg-5.1.2
     docker run --rm -ti heroku-activestorage-preview-build-heroku-20 bob deploy ffmpeg-5.1.2
-    docker run --rm -ti heroku-activestorage-preview-build-heroku-18 bob deploy ffmpeg-5.1.2
 
 The package uses `libaom`, `libdav1d` and `libsvtav1enc` if available.
