@@ -65,7 +65,7 @@ To build and upload to S3, run `bob deploy`. To only build, run `bob build` (thi
 
 *You need to pass in the necessary `AWS_` and `S3_` env vars using `--env-file` or `--env`.*
 
-    docker run --rm -ti heroku-activestorage-preview-build-heroku-22 bob deploy ffmpeg-5.1.2
-    docker run --rm -ti heroku-activestorage-preview-build-heroku-20 bob deploy ffmpeg-5.1.2
+    docker run --rm -ti heroku-activestorage-preview-build-heroku-22 bob deploy ffmpeg-5.1.4
+    docker run --rm -ti heroku-activestorage-preview-build-heroku-20 bob deploy ffmpeg-5.1.4
 
 The package uses `libaom`, `libdav1d` and `libsvtav1enc` if available.
