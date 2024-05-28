@@ -5,7 +5,7 @@ on:
   workflow_dispatch:
     inputs:
       formulae:
-        description: 'Shell word list of formulae to build; any Bash wildcards are allowed, e.g. "ffmpeg-5.*"'
+        description: 'Shell word list of formulae to build; any Bash wildcards are allowed, e.g. "ffmpeg-7.*"'
         type: string
         required: true
       stack:
@@ -14,6 +14,8 @@ on:
         options:
         - heroku-20
         - heroku-22
+        - heroku-24_amd64
+        - heroku-24_arm64
         required: true
       dry-run:
         description: 'Build packages without deploying to S3 (e.g. for testing a formula)'
@@ -58,7 +60,7 @@ jobs:
           echo -n "matrix=" >> "$GITHUB_OUTPUT"
           printf "%s\n" "${formulae[@]}" | jq -jcRn '[inputs|select(length>0)]' >> "$GITHUB_OUTPUT"
   docker-build:
-    runs-on: ubuntu-22.04
+    runs-on: ${{ endsWith(inputs.stack, '_arm64') && 'pub-hk-ubuntu-22.04-arm-small' || 'ubuntu-22.04' }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -70,16 +72,19 @@ jobs:
           path: /tmp/docker-cache.tar.gz
       - name: Build Docker image
         if: steps.cache-docker.outputs.cache-hit != 'true'
+        # our "input" stack might contain a "_amd64" or "_arm64" suffix, which we strip off for the Dockerfile name
         run: |
           cd build
-          docker build --tag heroku-activestorage-preview-build-${{inputs.stack}}:${{github.sha}} --file ${{inputs.stack}}.Dockerfile .
+          shopt -s extglob
+          stackname_with_architecture=${{inputs.stack}}
+          docker build --tag heroku-activestorage-preview-build-${stackname_with_architecture}:${{github.sha}} --file ${stackname_with_architecture%_?(amd|arm)64}.Dockerfile .
       - name: Save built Docker image
         if: steps.cache-docker.outputs.cache-hit != 'true'
         run: docker save heroku-activestorage-preview-build-${{inputs.stack}}:${{github.sha}} | gzip -1 > /tmp/docker-cache.tar.gz
   deploys:
     needs: [formulae-list, docker-build]
     if: ${{ needs.formulae-list.outputs.formulae != '[]' && needs.formulae-list.outputs.formulae != '' }}
-    runs-on: pub-hk-ubuntu-22.04-large
+    runs-on: ${{ endsWith(inputs.stack, '_arm64') && 'pub-hk-ubuntu-22.04-arm-large' || 'pub-hk-ubuntu-22.04-large' }}
     strategy:
       max-parallel: ${{ fromJSON(inputs.concurrency) }}
       matrix:

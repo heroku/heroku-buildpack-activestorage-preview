@@ -6,6 +6,8 @@ This subdirectory contains `Dockerfile`s for building binaries (currently only F
 
 **After every change to your formulae, perform the following** from this `build/` subdirectory to rebuild the images for each stack:
 
+    docker build --pull --tag heroku-activestorage-preview-build-heroku-24:amd64 --platform linux/amd64 --file heroku-24.Dockerfile .
+    docker build --pull --tag heroku-activestorage-preview-build-heroku-24:arm64 --platform linux/arm64 --file heroku-24.Dockerfile .
     docker build --pull --tag heroku-activestorage-preview-build-heroku-22 --file heroku-22.Dockerfile .
     docker build --pull --tag heroku-activestorage-preview-build-heroku-20 --file heroku-20.Dockerfile .
 
@@ -19,6 +21,8 @@ Out of the box, each `Dockerfile` has the correct values predefined for `S3_BUCK
 
 You can e.g. `bash` into each of the images you built using their tag:
 
+    docker run --rm -ti heroku-activestorage-preview-build-heroku-24:amd64 bash
+    docker run --rm -ti heroku-activestorage-preview-build-heroku-24:arm64 bash
     docker run --rm -ti heroku-activestorage-preview-build-heroku-22 bash
     docker run --rm -ti heroku-activestorage-preview-build-heroku-20 bash
 
@@ -65,6 +69,8 @@ To build and upload to S3, run `bob deploy`. To only build, run `bob build` (thi
 
 *You need to pass in the necessary `AWS_` and `S3_` env vars using `--env-file` or `--env`.*
 
+    docker run --rm -ti heroku-activestorage-preview-build-heroku-24:amd64 bob deploy ffmpeg-7.0.1
+    docker run --rm -ti heroku-activestorage-preview-build-heroku-24:arm64 bob deploy ffmpeg-7.0.1
     docker run --rm -ti heroku-activestorage-preview-build-heroku-22 bob deploy ffmpeg-5.1.4
     docker run --rm -ti heroku-activestorage-preview-build-heroku-20 bob deploy ffmpeg-5.1.4
 
