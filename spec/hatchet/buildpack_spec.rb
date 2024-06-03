@@ -3,16 +3,9 @@ require_relative "../spec_helper.rb"
 RSpec.describe "This buildpack" do
   it "has its own tests" do
     # Specify where you want your buildpack to go using :default
-    buildpacks = [:default, "heroku/ruby"]
+    buildpacks = [:default]
 
-    # To deploy a different app modify the hatchet.json or
-    # commit an app to your source control and use a path
-    # instead of "default_ruby" here
-    new_app_with_stack("default_ruby", buildpacks: buildpacks).tap do |app|
-      app.before_deploy do
-        # Modfiy the app here if you need
-        FileUtils.cp(fixtures.join("flashlight.mp4"), "./flashlight.mp4")
-      end
+    new_app_with_stack("spec/fixtures/", buildpacks: buildpacks).tap do |app|
       app.deploy do
         # Assert the behavior you desire here
         expect(app.output).to match("deployed to Heroku")

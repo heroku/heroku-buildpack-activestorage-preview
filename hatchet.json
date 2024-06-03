@@ -1,11 +1,1 @@
-{
-  "ruby_apps": [
-    "sharpstone/default_ruby"
-  ],
-  "node_apps": [
-    "heroku/node-js-getting-started"
-  ],
-  "python_apps": [
-    "heroku/python-getting-started"
-  ]
-}
+{}
