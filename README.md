@@ -18,6 +18,14 @@ heroku run bash
 /app/.heroku/activestorage-preview/bin/ffmpeg
 ```
 
+## FFMPEG Versions
+
+| Stack     | FFMPEG Version |
+|-----------|---------------:|
+| heroku-20 | 5.1.4 |
+| heroku-22 | 5.1.4 |
+| heroku-24 | 7.0.1 |
+
 ## Development
 
 ### Binaries

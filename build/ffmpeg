@@ -29,18 +29,28 @@ needed=(
 	libfreetype6 \
 	libfribidi0 \
 	libgraphite2-3 \
-	libgnutls30 \
 	libharfbuzz-gobject0 \
 	libharfbuzz-icu0 \
 	libharfbuzz0b \
 	libmp3lame0 \
 	libogg0 \
-	libunistring2 \
 	libvorbis0a \
 	libvorbisenc2 \
 	libvorbisfile3 \
 	zlib1g \
 )
+if [[ "$STACK" == "heroku-2"[02] ]]; then
+	needed+=(
+		libgnutls30
+		libunistring2
+	)
+else
+	needed+=(
+		libgnutls30t64
+		libunistring5
+	)
+fi
+	
 # we also apt-get install almost everything else from the compilation guide; in order of appearance
 needed+=(
 	libnuma1 \
@@ -61,14 +71,23 @@ if [[ "$STACK" == "heroku-20" ]]; then
 		libx265-179
 		libvpx6
 	)
-else
+elif [[ "$STACK" == "heroku-22" ]]; then
 	needed+=(
 		libaom3
-		libsvtav1enc0 # we can take this one from apt for 22.04+
-		libdav1d5 # we can take this one from apt for 22.04+
+		libsvtav1enc0 # recent enough since 22.04
+		libdav1d5 # recent enough since 22.04
 		libx264-163
 		libx265-199
 		libvpx7
+	)
+else
+	needed+=(
+		libaom3
+		libsvtav1enc1d1 # recent enough since 22.04
+		libdav1d7 # recent enough since 22.04
+		libx264-164
+		libx265-199
+		libvpx9
 	)
 fi
 
@@ -99,18 +118,27 @@ needed=(
   libvorbis-dev \
   # meson \ # installed via pip
   ninja-build \
-  pkg-config \
   texinfo \
   wget \
   yasm \
   zlib1g-dev
 )
+
 if [[ "$STACK" == "heroku-20" ]]; then
-	:
+	needed+=(
+		pkg-config
+	)
+elif [[ "$STACK" == "heroku-22" ]]; then
+	needed+=(
+		libdav1d-dev
+		libsvtav1enc-dev
+		pkg-config
+	)
 else
 	needed+=(
 		libdav1d-dev
 		libsvtav1enc-dev
+		pkgconf
 	)
 fi
 # we also apt-get install almost everything else from the compilation guide; in order of appearance

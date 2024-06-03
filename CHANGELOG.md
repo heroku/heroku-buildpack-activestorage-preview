@@ -1,3 +1,7 @@
+- FFMPEG 7.0.1 (for heroku-24)
+- Support multiple architectures
+- Support heroku-24
+- Upgrade FFMPEG to version 5.1.4
 - Remove support for Heroku-18
 - CI for all stacks (https://github.com/heroku/heroku-buildpack-activestorage-preview/pull/34)
 - Do not install Poppler utils, they are now on the stack image (https://github.com/heroku/heroku-buildpack-activestorage-preview/pull/32)
