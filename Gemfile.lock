@@ -1,6 +1,7 @@
 GEM
   remote: https://rubygems.org/
   specs:
+    diff-lcs (1.5.1)
     erubis (2.7.0)
     excon (0.110.0)
     heroics (0.1.2)
@@ -29,6 +30,9 @@ GEM
     rrrretry (1.0.0)
     rspec-core (3.13.0)
       rspec-support (~> 3.13.0)
+    rspec-expectations (3.13.0)
+      diff-lcs (>= 1.2.0, < 2.0)
+      rspec-support (~> 3.13.0)
     rspec-retry (0.6.2)
       rspec-core (> 3.3)
     rspec-support (3.13.1)
@@ -42,6 +46,7 @@ PLATFORMS
 DEPENDENCIES
   heroku_hatchet
   parallel_split_test
+  rspec-expectations
   rspec-retry
   webrick
 
