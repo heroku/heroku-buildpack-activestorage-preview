@@ -56,7 +56,7 @@ jobs:
           set -o pipefail
           shopt -s failglob
           formulae=( ${{inputs.formulae}} )
-          printf -- "- `%s`\n" "${formulae[@]}" >> "$GITHUB_STEP_SUMMARY"
+          printf -- '- `%s`\n' "${formulae[@]}" >> "$GITHUB_STEP_SUMMARY"
           echo -n "matrix=" >> "$GITHUB_OUTPUT"
           printf "%s\n" "${formulae[@]}" | jq -jcRn '[inputs|select(length>0)]' >> "$GITHUB_OUTPUT"
   docker-build:
