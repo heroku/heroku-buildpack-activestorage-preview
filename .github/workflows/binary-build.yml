@@ -1,0 +1,108 @@
+name: Platform packages build and deploy to S3
+run-name: Build ${{ inputs.dry-run == true && 'w/o deploy' || '& deploy' }}${{ inputs.overwrite == true && '(+overwrite)' || '' }} to dist_${{inputs.stack}}
+
+on:
+  workflow_dispatch:
+    inputs:
+      formulae:
+        description: 'Shell word list of formulae to build; any Bash wildcards are allowed, e.g. "ffmpeg-5.*"'
+        type: string
+        required: true
+      stack:
+        description: 'Stack to build for'
+        type: choice
+        options:
+        - heroku-20
+        - heroku-22
+        required: true
+      dry-run:
+        description: 'Build packages without deploying to S3 (e.g. for testing a formula)'
+        type: boolean
+        default: false
+        required: false
+      overwrite:
+        description: 'Overwrite existing packages'
+        type: boolean
+        default: false
+        required: false
+      concurrency:
+        description: 'GitHub Actions runner concurrency'
+        type: number
+        default: 1
+        required: true
+
+permissions:
+  contents: read
+
+jobs:
+  formulae-list:
+    runs-on: ubuntu-22.04
+    outputs:
+      formulae: ${{ steps.expand-formulae.outputs.matrix }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Install jq tool
+        run: |
+          sudo apt-get update
+          sudo apt-get install jq
+      - id: expand-formulae
+        name: Expand list of given formulae
+        run: |
+          cd build
+          echo '## Formulae input for building' >> "$GITHUB_STEP_SUMMARY"
+          set -o pipefail
+          shopt -s failglob
+          formulae=( ${{inputs.formulae}} )
+          printf -- "- `%s`\n" "${formulae[@]}" >> "$GITHUB_STEP_SUMMARY"
+          echo -n "matrix=" >> "$GITHUB_OUTPUT"
+          printf "%s\n" "${formulae[@]}" | jq -jcRn '[inputs|select(length>0)]' >> "$GITHUB_OUTPUT"
+  docker-build:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Cache Docker build
+        id: cache-docker
+        uses: actions/cache@v4
+        with:
+          key: docker-cache-heroku-activestorage-preview-build-${{inputs.stack}}.${{github.sha}}
+          path: /tmp/docker-cache.tar.gz
+      - name: Build Docker image
+        if: steps.cache-docker.outputs.cache-hit != 'true'
+        run: |
+          cd build
+          docker build --tag heroku-activestorage-preview-build-${{inputs.stack}}:${{github.sha}} --file ${{inputs.stack}}.Dockerfile .
+      - name: Save built Docker image
+        if: steps.cache-docker.outputs.cache-hit != 'true'
+        run: docker save heroku-activestorage-preview-build-${{inputs.stack}}:${{github.sha}} | gzip -1 > /tmp/docker-cache.tar.gz
+  deploys:
+    needs: [formulae-list, docker-build]
+    if: ${{ needs.formulae-list.outputs.formulae != '[]' && needs.formulae-list.outputs.formulae != '' }}
+    runs-on: pub-hk-ubuntu-22.04-large
+    strategy:
+      max-parallel: ${{ fromJSON(inputs.concurrency) }}
+      matrix:
+        formula: ${{ fromJSON(needs.formulae-list.outputs.formulae) }}
+    env:
+      AWS_ACCESS_KEY_ID:  ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Restore cached Docker build
+        uses: actions/cache/restore@v4
+        with:
+          key: docker-cache-heroku-activestorage-preview-build-${{inputs.stack}}.${{github.sha}}
+          path: /tmp/docker-cache.tar.gz
+      - name: Load cached Docker image
+        run: docker load -i /tmp/docker-cache.tar.gz
+      - name: Build formula without deploying
+        if: ${{ inputs.dry-run == true }}
+        run: docker run --rm --env-file=build/env.default heroku-activestorage-preview-build-${{inputs.stack}}:${{github.sha}} bob build ${{matrix.formula}}
+      - name: Build and deploy formula
+        if: ${{ inputs.dry-run == false && inputs.overwrite == false }}
+        run: docker run --rm --env-file=build/env.default heroku-activestorage-preview-build-${{inputs.stack}}:${{github.sha}} bob deploy ${{matrix.formula}}
+      - name: Build and deploy(+overwrite) formula
+        if: ${{ inputs.dry-run == false && inputs.overwrite == true }}
+        run: docker run --rm --env-file=build/env.default heroku-activestorage-preview-build-${{inputs.stack}}:${{github.sha}} bob deploy --overwrite ${{matrix.formula}}
