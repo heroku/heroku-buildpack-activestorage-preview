@@ -38,7 +38,7 @@ permissions:
 
 jobs:
   formulae-list:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     outputs:
       formulae: ${{ steps.expand-formulae.outputs.matrix }}
     steps:
@@ -60,7 +60,7 @@ jobs:
           echo -n "matrix=" >> "$GITHUB_OUTPUT"
           printf "%s\n" "${formulae[@]}" | jq -jcRn '[inputs|select(length>0)]' >> "$GITHUB_OUTPUT"
   docker-build:
-    runs-on: ${{ endsWith(inputs.stack, '_arm64') && 'pub-hk-ubuntu-22.04-arm-small' || 'ubuntu-22.04' }}
+    runs-on: ${{ endsWith(inputs.stack, '_arm64') && 'pub-hk-ubuntu-24.04-arm-small' || 'ubuntu-24.04' }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -84,7 +84,7 @@ jobs:
   deploys:
     needs: [formulae-list, docker-build]
     if: ${{ needs.formulae-list.outputs.formulae != '[]' && needs.formulae-list.outputs.formulae != '' }}
-    runs-on: ${{ endsWith(inputs.stack, '_arm64') && 'pub-hk-ubuntu-22.04-arm-large' || 'pub-hk-ubuntu-22.04-large' }}
+    runs-on: ${{ endsWith(inputs.stack, '_arm64') && 'pub-hk-ubuntu-24.04-arm-large' || 'pub-hk-ubuntu-24.04-large' }}
     strategy:
       max-parallel: ${{ fromJSON(inputs.concurrency) }}
       matrix:
