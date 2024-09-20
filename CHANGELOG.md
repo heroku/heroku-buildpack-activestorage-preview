@@ -1,3 +1,5 @@
+- Upgrade FFMPEG to version 7.0.2
+- Upgrade FFMPEG to version 5.1.6
 - FFMPEG 7.0.1 (for heroku-24)
 - Support multiple architectures
 - Support heroku-24
