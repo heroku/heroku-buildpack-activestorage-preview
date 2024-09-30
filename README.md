@@ -24,7 +24,7 @@ heroku run bash
 |-----------|---------------:|
 | heroku-20 | 5.1.6 |
 | heroku-22 | 5.1.6 |
-| heroku-24 | 7.0.2 |
+| heroku-24 | 7.1 |
 
 ## Development
 
