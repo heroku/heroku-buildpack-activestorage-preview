@@ -1,3 +1,4 @@
+- Upgrade FFMPEG to version 7.1.1 (https://github.com/heroku/heroku-buildpack-activestorage-preview/pull/64)
 - Upgrade FFMPEG to version 7.1
 - Upgrade FFMPEG to version 7.0.2
 - Upgrade FFMPEG to version 5.1.6
