@@ -22,7 +22,6 @@ heroku run bash
 
 | Stack     | FFMPEG Version |
 |-----------|---------------:|
-| heroku-20 | 5.1.6 |
 | heroku-22 | 5.1.6 |
 | heroku-24 | 7.1.1 |
 
