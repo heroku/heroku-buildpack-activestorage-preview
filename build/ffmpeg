@@ -50,7 +50,7 @@ else
 		libunistring5
 	)
 fi
-	
+
 # we also apt-get install almost everything else from the compilation guide; in order of appearance
 needed+=(
 	libnuma1 \
@@ -64,14 +64,7 @@ needed+=(
 	libtheora0 \
 )
 # some version-specific installs
-if [[ "$STACK" == "heroku-20" ]]; then
-	needed+=(
-		libaom0
-		libx264-155
-		libx265-179
-		libvpx6
-	)
-elif [[ "$STACK" == "heroku-22" ]]; then
+if [[ "$STACK" == "heroku-22" ]]; then
 	needed+=(
 		libaom3
 		libsvtav1enc0 # recent enough since 22.04
@@ -124,11 +117,7 @@ needed=(
   zlib1g-dev
 )
 
-if [[ "$STACK" == "heroku-20" ]]; then
-	needed+=(
-		pkg-config
-	)
-elif [[ "$STACK" == "heroku-22" ]]; then
+if [[ "$STACK" == "heroku-22" ]]; then
 	needed+=(
 		libdav1d-dev
 		libsvtav1enc-dev
