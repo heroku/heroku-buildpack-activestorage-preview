@@ -59,7 +59,7 @@ jobs:
           echo -n "matrix=" >> "$GITHUB_OUTPUT"
           printf "%s\n" "${formulae[@]}" | jq -jcRn '[inputs|select(length>0)]' >> "$GITHUB_OUTPUT"
   docker-build:
-    runs-on: ${{ endsWith(inputs.stack, '_arm64') && 'pub-hk-ubuntu-24.04-arm-small' || 'ubuntu-24.04' }}
+    runs-on: ${{ endsWith(inputs.stack, '_arm64') && 'ubuntu-24.04-arm' || 'ubuntu-24.04' }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
