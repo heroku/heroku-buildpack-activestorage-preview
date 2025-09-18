@@ -6,7 +6,7 @@ set -eu -o pipefail
 if [[ $STACK == "heroku-2"[02] ]]; then
 	FFMPEG_VERSION="5.1.7"
 else
-	FFMPEG_VERSION="7.1.1"
+	FFMPEG_VERSION="7.1.2"
 fi
 INSTALL_URL="https://heroku-activestorage-default.s3.amazonaws.com/dist_${STACK}_$(dpkg --print-architecture)/ffmpeg-${FFMPEG_VERSION}.tar.gz"
 
