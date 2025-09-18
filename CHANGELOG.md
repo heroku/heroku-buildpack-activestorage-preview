@@ -1,13 +1,13 @@
-- Upgrade FFMPEG to version 7.1.1 (https://github.com/heroku/heroku-buildpack-activestorage-preview/pull/64)
-- Upgrade FFMPEG to version 7.1
-- Upgrade FFMPEG to version 7.0.2
-- Upgrade FFMPEG to version 5.1.6
-- FFMPEG 7.0.1 (for heroku-24)
+- Upgrade FFmpeg to version 7.1.1 (https://github.com/heroku/heroku-buildpack-activestorage-preview/pull/64)
+- Upgrade FFmpeg to version 7.1
+- Upgrade FFmpeg to version 7.0.2
+- Upgrade FFmpeg to version 5.1.6
+- FFmpeg 7.0.1 (for heroku-24)
 - Support multiple architectures
 - Support heroku-24
-- Upgrade FFMPEG to version 5.1.4
+- Upgrade FFmpeg to version 5.1.4
 - Remove support for Heroku-18
 - CI for all stacks (https://github.com/heroku/heroku-buildpack-activestorage-preview/pull/34)
 - Do not install Poppler utils, they are now on the stack image (https://github.com/heroku/heroku-buildpack-activestorage-preview/pull/32)
-- Upgrade FFMPEG to version 5.1.2 (https://github.com/heroku/heroku-buildpack-activestorage-preview/pull/30)
-- Include build formula for FFMPEG, now linking dynamically against newly added [stack image packages](https://devcenter.heroku.com/changelog-items/2547) (https://github.com/heroku/heroku-buildpack-activestorage-preview/pull/28)
+- Upgrade FFmpeg to version 5.1.2 (https://github.com/heroku/heroku-buildpack-activestorage-preview/pull/30)
+- Include build formula for FFmpeg, now linking dynamically against newly added [stack image packages](https://devcenter.heroku.com/changelog-items/2547) (https://github.com/heroku/heroku-buildpack-activestorage-preview/pull/28)

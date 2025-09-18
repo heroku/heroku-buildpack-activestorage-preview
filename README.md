@@ -2,7 +2,7 @@
 
 This is an [official Heroku buildpack](https://devcenter.heroku.com/articles/language-support-policy#supported-buildpacks) to support Rails 5.2 users of [Active Storage previews](https://devcenter.heroku.com/articles/active-storage-on-heroku).
 
-One of the marquee features of Active Storage is the ability to use “previews” of non-image attachments. Specifically you can preview PDFs and Videos. To use this feature your application needs access to system resources that know how to work with these files. By default Rails ships with support for two PDF libraries, one of which is available on Heroku, and it can use FFMPEG for Video previews, which is not available by default on Heroku.
+One of the marquee features of Active Storage is the ability to use “previews” of non-image attachments. Specifically you can preview PDFs and Videos. To use this feature your application needs access to system resources that know how to work with these files. By default Rails ships with support for two PDF libraries, one of which is available on Heroku, and it can use FFmpeg for Video previews, which is not available by default on Heroku.
 
 If you want the ability to preview video files with Active Support you need to run:
 
@@ -18,9 +18,9 @@ heroku run bash
 /app/.heroku/activestorage-preview/bin/ffmpeg
 ```
 
-## FFMPEG Versions
+## FFmpeg Versions
 
-| Stack     | FFMPEG Version |
+| Stack     | FFmpeg Version |
 |-----------|---------------:|
 | heroku-22 | 5.1.6 |
 | heroku-24 | 7.1.1 |
@@ -29,7 +29,7 @@ heroku run bash
 
 ### Binaries
 
-Instructions for building binaries (currently only FFMPEG) can be found in [build/README.md](build/README.md).
+Instructions for building binaries (currently only FFmpeg) can be found in [build/README.md](build/README.md).
 
 ### Versioning
 

@@ -56,7 +56,7 @@ needed+=(
 	libnuma1 \
 	libopus0 \
 )
-# this is for SFFMPEG parity
+# this is for SFFmpeg parity
 needed+=(
 	libopencore-amrnb0 \
 	libopencore-amrwb0 \
@@ -140,7 +140,7 @@ needed+=(
 	# libfdk-aac-dev # not for now, as it's multiverse, and requires --enable-nonfree
 	libopus-dev
 )
-# this is for SFFMPEG parity
+# this is for SFFmpeg parity
 needed+=(
 	libopencore-amrnb-dev \
 	libopencore-amrwb-dev \
@@ -155,12 +155,12 @@ if [[ "$missing" ]]; then
 	apt-get install --no-install-recommends -q -y $missing
 fi
 
-# ffmpeg time!
+# FFmpeg time!
 echo "-----> Downloading ${dep_archive_name}..."
 curl -L "${dep_url}" | tar xj
 pushd "${dep_dirname}"
 
-echo "-----> Configuring FFMPEG..."
+echo "-----> Configuring FFmpeg..."
 configureopts=(
 	--prefix="${OUT_PREFIX}" \
 	--pkg-config-flags="--static" \
@@ -207,7 +207,7 @@ if [[ " ${needed[*]} " =~ " libsvtav1enc-dev " ]]; then
 else
 	echo "       building without libsvtav1enc"
 fi
-# the following are for better parity with SFFMPEG
+# the following are for better parity with SFFmpeg
 configureopts+=(
 	--enable-pic \
 	--enable-runtime-cpudetect \
@@ -223,11 +223,11 @@ configureopts+=(
 )
 PATH="${OUT_PREFIX}/bin:$PATH" PKG_CONFIG_PATH="${OUT_PREFIX}/lib/pkgconfig" ./configure "${configureopts[@]}"
 
-echo "-----> Building FFMPEG..."
+echo "-----> Building FFmpeg..."
 PATH="${OUT_PREFIX}/bin:$PATH" make -s -j9
-echo "-----> Installing FFMPEG..."
+echo "-----> Installing FFmpeg..."
 make install -s
 echo "-----> Removing include/, lib/, and share/ffmpeg/examples/..."
 rm -rf "${OUT_PREFIX}"/{include,lib,share/ffmpeg/examples}
-# no stripping needed, FFMPEG does that already during build
+# no stripping needed, FFmpeg does that already during build
 popd
