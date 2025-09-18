@@ -4,7 +4,7 @@
 set -eu -o pipefail
 
 if [[ $STACK == "heroku-2"[02] ]]; then
-	FFMPEG_VERSION="5.1.6"
+	FFMPEG_VERSION="5.1.7"
 else
 	FFMPEG_VERSION="7.1.1"
 fi
