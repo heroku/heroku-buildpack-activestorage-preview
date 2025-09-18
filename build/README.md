@@ -1,6 +1,6 @@
 # Building Packages
 
-This subdirectory contains `Dockerfile`s for building binaries (currently only FFMPEG).
+This subdirectory contains `Dockerfile`s for building binaries (currently only FFmpeg).
 
 ## Building the Image
 
@@ -63,7 +63,7 @@ For this method, it is important to keep the credentials file in a location outs
 
 To build and upload to S3, run `bob deploy`. To only build, run `bob build` (this is really only useful inside a `docker run … bash` session, so one can inspect the resulting build).
 
-### FFMPEG
+### FFmpeg
 
 *You need to pass in the necessary `AWS_` and `S3_` env vars using `--env-file` or `--env`.*
 

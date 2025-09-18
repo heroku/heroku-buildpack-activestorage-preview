@@ -4,9 +4,9 @@
 set -eu -o pipefail
 
 if [[ $STACK == "heroku-2"[02] ]]; then
-	FFMPEG_VERSION="5.1.6"
+	FFMPEG_VERSION="5.1.7"
 else
-	FFMPEG_VERSION="7.1.1"
+	FFMPEG_VERSION="7.1.2"
 fi
 INSTALL_URL="https://heroku-activestorage-default.s3.amazonaws.com/dist_${STACK}_$(dpkg --print-architecture)/ffmpeg-${FFMPEG_VERSION}.tar.gz"
 
@@ -42,9 +42,9 @@ echo '-----> Installing binary dependencies for ActiveStorage Preview'
 INSTALL_DIR="$BUILD_DIR/.heroku/activestorage-preview"
 mkdir -p "$INSTALL_DIR"
 
-echo "Downloading ffmpeg version $FFMPEG_VERSION" | indent
+echo "Downloading FFmpeg version $FFMPEG_VERSION" | indent
 curl_retry_on_18 -s --fail --retry 3 --retry-connrefused --connect-timeout "${CURL_CONNECT_TIMEOUT:-3}" "$INSTALL_URL" | tar xvz -C "$INSTALL_DIR" >/dev/null 2>&1
-echo 'Installing ffmpeg' | indent
+echo 'Installing FFmpeg' | indent
 echo 'Done' | indent
 
 paths=$(cd "$BUILD_DIR" && find ./.heroku/activestorage-preview -iregex '.*/bin' -type d)
