@@ -42,7 +42,7 @@ GEM
     rspec-support (3.13.4)
     thor (1.4.0)
     threaded (0.0.4)
-    webrick (1.9.1)
+    webrick (1.9.2)
 
 PLATFORMS
   ruby
