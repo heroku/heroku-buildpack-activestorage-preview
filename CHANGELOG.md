@@ -1,3 +1,4 @@
+- Changed the S3 URLs used for downloads to use AWS' dual-stack (IPv6 compatible) endpoint. ([#75](https://github.com/heroku/heroku-buildpack-activestorage-preview/pull/75))
 - Upgrade FFmpeg to version 7.1.2
 - Upgrade FFmpeg to version 5.1.7
 - Upgrade FFmpeg to version 7.1.1 (https://github.com/heroku/heroku-buildpack-activestorage-preview/pull/64)
