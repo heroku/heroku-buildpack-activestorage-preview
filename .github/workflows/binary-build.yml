@@ -1,4 +1,4 @@
-name: Platform packages build and deploy to S3
+name: Build FFmpeg and deploy to S3
 run-name: Build ${{ inputs.dry-run == true && 'w/o deploy' || '& deploy' }}${{ inputs.overwrite == true && '(+overwrite)' || '' }} to dist_${{inputs.stack}}
 
 on:
@@ -15,6 +15,8 @@ on:
         - heroku-22
         - heroku-24_amd64
         - heroku-24_arm64
+        - heroku-26_amd64
+        - heroku-26_arm64
         required: true
       dry-run:
         description: 'Build packages without deploying to S3 (e.g. for testing a formula)'

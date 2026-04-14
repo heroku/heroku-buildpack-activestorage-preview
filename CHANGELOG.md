@@ -1,3 +1,7 @@
+- Add support for Heroku-26
+- Drop support for Heroku-20
+- Upgrade FFmpeg (5.1.7 -> 5.1.8 for Heroku-22 and 7.1.2 -> 7.1.3 for Heroku-24)
+- Show curl error messages when downloading from S3
 - Changed the S3 URLs used for downloads to use AWS' dual-stack (IPv6 compatible) endpoint. ([#75](https://github.com/heroku/heroku-buildpack-activestorage-preview/pull/75))
 - Upgrade FFmpeg to version 7.1.2
 - Upgrade FFmpeg to version 5.1.7
