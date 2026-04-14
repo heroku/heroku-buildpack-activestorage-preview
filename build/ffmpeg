@@ -39,7 +39,7 @@ needed=(
 	libvorbisfile3 \
 	zlib1g \
 )
-if [[ "$STACK" == "heroku-2"[02] ]]; then
+if [[ "$STACK" == "heroku-22" ]]; then
 	needed+=(
 		libgnutls30
 		libunistring2
@@ -61,26 +61,37 @@ needed+=(
 	libopencore-amrnb0 \
 	libopencore-amrwb0 \
 	libspeex1 \
-	libtheora0 \
 )
 # some version-specific installs
 if [[ "$STACK" == "heroku-22" ]]; then
 	needed+=(
 		libaom3
-		libsvtav1enc0 # recent enough since 22.04
-		libdav1d5 # recent enough since 22.04
+		libsvtav1enc0
+		libdav1d5
+		libtheora0
 		libx264-163
 		libx265-199
 		libvpx7
 	)
-else
+elif [[ "$STACK" == "heroku-24" ]]; then
 	needed+=(
 		libaom3
-		libsvtav1enc1d1 # recent enough since 22.04
-		libdav1d7 # recent enough since 22.04
+		libsvtav1enc1d1
+		libdav1d7
+		libtheora0
 		libx264-164
 		libx265-199
 		libvpx9
+	)
+else
+	needed+=(
+		libaom3
+		libsvtav1enc2
+		libdav1d7
+		libtheora1
+		libx264-165
+		libx265-215
+		libvpx12
 	)
 fi
 

@@ -1,4 +1,4 @@
-FROM heroku/heroku:24-build
+FROM heroku/heroku:26-build
 
 ARG TARGETARCH
 
@@ -7,9 +7,9 @@ USER root
 WORKDIR /app
 ENV WORKSPACE_DIR=/app
 ENV S3_BUCKET=heroku-activestorage-default
-ENV S3_PREFIX=dist_heroku-24_${TARGETARCH}/
+ENV S3_PREFIX=dist_heroku-26_${TARGETARCH}/
 ENV S3_REGION=us-east-1
-ENV STACK=heroku-24
+ENV STACK=heroku-26
 ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update && apt-get install -y python3-pip python3-venv

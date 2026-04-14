@@ -3,11 +3,22 @@
 
 set -eu -o pipefail
 
-if [[ $STACK == "heroku-2"[02] ]]; then
-	FFMPEG_VERSION="5.1.7"
-else
-	FFMPEG_VERSION="7.1.2"
-fi
+case "${STACK}" in
+  heroku-26)
+    FFMPEG_VERSION="8.1"
+    ;;
+  heroku-24)
+    FFMPEG_VERSION="7.1.3"
+    ;;
+  heroku-22)
+    FFMPEG_VERSION="5.1.8"
+    ;;
+  *)
+    echo "Error: The '${STACK}' stack isn't supported." >&2
+    exit 1
+    ;;
+esac
+
 INSTALL_URL="https://heroku-activestorage-default.s3.dualstack.us-east-1.amazonaws.com/dist_${STACK}_$(dpkg --print-architecture)/ffmpeg-${FFMPEG_VERSION}.tar.gz"
 
 BUILDPACK_DIR="$(dirname "$(dirname "$0")")"
@@ -43,7 +54,7 @@ INSTALL_DIR="$BUILD_DIR/.heroku/activestorage-preview"
 mkdir -p "$INSTALL_DIR"
 
 echo "Downloading FFmpeg version $FFMPEG_VERSION" | indent
-curl_retry_on_18 -s --fail --retry 3 --retry-connrefused --connect-timeout "${CURL_CONNECT_TIMEOUT:-3}" "$INSTALL_URL" | tar xvz -C "$INSTALL_DIR" >/dev/null 2>&1
+curl_retry_on_18 --no-progress-meter --fail --retry 3 --retry-connrefused --connect-timeout "${CURL_CONNECT_TIMEOUT:-3}" "$INSTALL_URL" | tar xz -C "$INSTALL_DIR" | indent
 echo 'Installing FFmpeg' | indent
 echo 'Done' | indent
 
