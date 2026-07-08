@@ -24,7 +24,7 @@ jobs:
       PARALLEL_SPLIT_TEST_PROCESSES: 5
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
       - name: Set up Ruby and dependencies
         uses: ruby/setup-ruby@v1
         with:
